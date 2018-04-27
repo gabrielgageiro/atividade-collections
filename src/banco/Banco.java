@@ -8,11 +8,12 @@ package banco;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class Banco {
 
     private String nome;
-    private List<Conta> contas = new ArrayList<>();
+    private static List<Conta> contas = new ArrayList<>();
 
     public Banco(String nome) {
         this.nome = nome;
@@ -20,10 +21,15 @@ public class Banco {
 
 
     public void adiciona(Conta c) {
-        contas.add(c);
+        if(verificarConta(c)){
+            System.out.println("Conta já existente!");
+            return;
+        }
+            contas.add(c);
     }
 
     public Conta getConta(int numero) {
+
 
         return contas.stream().filter((c) -> c.getNumero() == numero).findFirst().get();
     }
@@ -36,8 +42,8 @@ public class Banco {
             statusRemocao(0);
     }
 
-    private boolean verificarConta(Conta c ){
-        return contas.contains(c);
+    private boolean verificarConta(Conta c ) {
+        return contas.stream().anyMatch((e) -> e.getNumero() == c.getNumero());
     }
 
     private void statusRemocao(int c) {
@@ -50,14 +56,10 @@ public class Banco {
     }
 
     public void fecharConta(Integer numero) {
-        contas.forEach(c -> {
-            if (c.getNumero() == numero) {
-                contas.remove(c);
-                statusRemocao(1);
-
-                return;
-            }
-        });
+        if(contas.removeIf( e-> e.getNumero()==numero)){
+            statusRemocao(1);
+            return;
+        };
         statusRemocao(0);
     }
 
